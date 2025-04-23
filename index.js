@@ -1,35 +1,151 @@
 let timer = document.querySelector(".timer");
-let h = document.querySelector("#h");
-let m = document.querySelector("#m");
-let s = document.querySelector("#s");
 
 let hoursField = document.querySelector("#hours");
 let minutesField = document.querySelector("#minutes");
 let time = 0;
 let countDown;
+let displayedHours = "00";
+let displayedMinutes = "00";
+let displayedSeconds = "00";
 
 let startBtn = document.querySelector("#start");
 let stopBtn = document.querySelector("#stop");
 let resetBtn = document.querySelector("#reset");
+let continueBtn = document.querySelector("#continue");
 
 let isRunning = false;
-
 
 startBtn.addEventListener("click", function () {
     if (!isRunning) {
         console.log("running");
         isRunning = true;
-        let hours = hoursField.value;
-        let minutes = minutesField.value;
-        time = (hours * 60 * 60) + (minutes * 60);
+        let hours = parseInt(hoursField.value) || 0;
+        let minutes = parseInt(minutesField.value) || 0;
+        time = Math.max(0, hours * 60 * 60 + minutes * 60);
+
+        displayedHours = String(Math.floor((time / (60 * 60)) % 60)).padStart(2, '0');
+        displayedMinutes = String(Math.floor((time / 60) % 60)).padStart(2, '0');
+        displayedSeconds = String(Math.floor(time % 60)).padStart(2, '0');
+        timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
+
+        startBtn.disabled = true;
+        stopBtn.disabled = false; 
+        resetBtn.disabled = false;
+        continueBtn.classList.add("hidden");
+
+        clearInterval(countDown);
+
         countDown = setInterval(() => {
+            if (time <= 0) {
+                clearInterval(countDown);
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                
+                timer.innerHTML = "00 : 00 : 00";
+                return;
+            }
+
             time -= 1;
-            timer.innerHTML = time;
+
+            displayedHours = String(Math.floor((time / (60 * 60)) % 60)).padStart(2, '0');
+            displayedMinutes = String(Math.floor((time / 60) % 60)).padStart(2, '0');
+            displayedSeconds = String(Math.floor(time % 60)).padStart(2, '0');
+
+            timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
+
+            if (time <= 0) {
+                clearInterval(countDown);
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
         }, 1000);
     }
-
 });
 
 stopBtn.addEventListener("click", function () {
-    isRunning ?  clearInterval(countDown) : console.log("Timer is already running"); 
-})
+    if (isRunning) {
+        clearInterval(countDown);
+        isRunning = false;
+        console.log("Timer Stopped");
+        startBtn.classList.add("hidden");
+        continueBtn.classList.remove("hidden");
+        startBtn.disabled = true;
+        stopBtn.disabled = true;
+        continueBtn.disabled = false;
+    } else {
+        console.log("Timer is already stopped or finished");
+    }
+});
+
+resetBtn.addEventListener("click", function () {
+    isRunning = false;
+    clearInterval(countDown);
+    console.log("Timer reset");
+    time = 0; 
+    hoursField.value = "00";
+    minutesField.value = "00";
+    timer.innerHTML = "00 : 00 : 00";
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    continueBtn.disabled = true;
+    continueBtn.classList.add("hidden");
+    startBtn.classList.remove("hidden");
+});
+
+continueBtn.addEventListener("click", function () {
+    if (!isRunning && time > 0) {
+        console.log("Timer is running again");
+        isRunning = true;
+        startBtn.classList.remove("hidden");
+        continueBtn.classList.add("hidden");
+        startBtn.disabled = true;
+        stopBtn.disabled = false; 
+        resetBtn.disabled = false;
+
+        clearInterval(countDown);
+
+        countDown = setInterval(() => {
+            if (time <= 0) {
+                clearInterval(countDown);
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+                timer.innerHTML = "00 : 00 : 00";
+                return;
+            }
+
+            time -= 1;
+
+            displayedHours = String(Math.floor((time / (60 * 60)) % 60)).padStart(2, '0');
+            displayedMinutes = String(Math.floor((time / 60) % 60)).padStart(2, '0');
+            displayedSeconds = String(Math.floor(time % 60)).padStart(2, '0');
+
+            timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
+
+            if (time <= 0) {
+                clearInterval(countDown);
+                isRunning = false;
+                startBtn.disabled = false;
+                stopBtn.disabled = true;
+            }
+        }, 1000);
+    } else {
+         console.log("Timer cannot continue (already running or time is zero).");
+    }
+});
+
+function initializeTimer() {
+    timer.innerHTML = "00 : 00 : 00";
+    hoursField.value = "00";
+    minutesField.value = "00";
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    resetBtn.disabled = true;
+    continueBtn.disabled = true;
+    continueBtn.classList.add("hidden");
+    startBtn.classList.remove("hidden");
+}
+
+initializeTimer();
