@@ -7,13 +7,31 @@ let countDown;
 let displayedHours = "00";
 let displayedMinutes = "00";
 let displayedSeconds = "00";
+let inactivityTimeout; 
 
 let startBtn = document.querySelector("#start");
 let stopBtn = document.querySelector("#stop");
 let resetBtn = document.querySelector("#reset");
 let continueBtn = document.querySelector("#continue");
+let container = document.querySelector(".container");
 
 let isRunning = false;
+
+
+function hideControls() {
+    container.classList.add("temp-hide");
+    timer.style.cssText = "background-color: transparent;";
+}
+
+
+function showControls() {
+    clearTimeout(inactivityTimeout);
+    container.classList.remove("temp-hide");
+    timer.style.cssText = ""; 
+    if (isRunning) {
+        inactivityTimeout = setTimeout(hideControls, 5000);
+    }
+}
 
 startBtn.addEventListener("click", function () {
     if (!isRunning) {
@@ -29,11 +47,12 @@ startBtn.addEventListener("click", function () {
         timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
 
         startBtn.disabled = true;
-        stopBtn.disabled = false; 
+        stopBtn.disabled = false;
         resetBtn.disabled = false;
         continueBtn.classList.add("hidden");
 
         clearInterval(countDown);
+        showControls(); 
 
         countDown = setInterval(() => {
             if (time <= 0) {
@@ -41,8 +60,8 @@ startBtn.addEventListener("click", function () {
                 isRunning = false;
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
-                
                 timer.innerHTML = "00 : 00 : 00";
+                showControls(); 
                 return;
             }
 
@@ -53,13 +72,6 @@ startBtn.addEventListener("click", function () {
             displayedSeconds = String(Math.floor(time % 60)).padStart(2, '0');
 
             timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
-
-            if (time <= 0) {
-                clearInterval(countDown);
-                isRunning = false;
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-            }
         }, 1000);
     }
 });
@@ -74,6 +86,7 @@ stopBtn.addEventListener("click", function () {
         startBtn.disabled = true;
         stopBtn.disabled = true;
         continueBtn.disabled = false;
+        showControls(); 
     } else {
         console.log("Timer is already stopped or finished");
     }
@@ -83,7 +96,7 @@ resetBtn.addEventListener("click", function () {
     isRunning = false;
     clearInterval(countDown);
     console.log("Timer reset");
-    time = 0; 
+    time = 0;
     hoursField.value = "00";
     minutesField.value = "00";
     timer.innerHTML = "00 : 00 : 00";
@@ -92,6 +105,7 @@ resetBtn.addEventListener("click", function () {
     continueBtn.disabled = true;
     continueBtn.classList.add("hidden");
     startBtn.classList.remove("hidden");
+    showControls(); 
 });
 
 continueBtn.addEventListener("click", function () {
@@ -101,10 +115,11 @@ continueBtn.addEventListener("click", function () {
         startBtn.classList.remove("hidden");
         continueBtn.classList.add("hidden");
         startBtn.disabled = true;
-        stopBtn.disabled = false; 
+        stopBtn.disabled = false;
         resetBtn.disabled = false;
 
         clearInterval(countDown);
+        showControls(); 
 
         countDown = setInterval(() => {
             if (time <= 0) {
@@ -113,6 +128,7 @@ continueBtn.addEventListener("click", function () {
                 startBtn.disabled = false;
                 stopBtn.disabled = true;
                 timer.innerHTML = "00 : 00 : 00";
+                showControls(); 
                 return;
             }
 
@@ -123,13 +139,6 @@ continueBtn.addEventListener("click", function () {
             displayedSeconds = String(Math.floor(time % 60)).padStart(2, '0');
 
             timer.innerHTML = `${displayedHours} : ${displayedMinutes} : ${displayedSeconds}`;
-
-            if (time <= 0) {
-                clearInterval(countDown);
-                isRunning = false;
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-            }
         }, 1000);
     } else {
          console.log("Timer cannot continue (already running or time is zero).");
@@ -146,6 +155,9 @@ function initializeTimer() {
     continueBtn.disabled = true;
     continueBtn.classList.add("hidden");
     startBtn.classList.remove("hidden");
+    showControls(); 
 }
 
 initializeTimer();
+
+document.body.addEventListener("mouseenter", showControls);

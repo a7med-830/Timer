@@ -6,14 +6,18 @@
     display: none;
 }
 
-/* .temphide {
-    display: none;
-    transition: display 0.3s ease;
+.container {
+    opacity: 1;
+    transition: opacity 0.8s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
-.temphide:hover {
-    display: block;
-} */
+.temp-hide {
+    opacity: 0;
+    pointer-events: none;
+}
 
 body {
     background-color: #121212;
@@ -38,7 +42,7 @@ body {
     background-color: #333;
     padding: 10px 20px;
     border-radius: 10px;
-    
+    transition: background-color 0.5s ease;
 }
 
 
