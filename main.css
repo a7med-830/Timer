@@ -6,6 +6,10 @@
     display: none;
 }
 
+i {
+    margin: 0 5px;
+}
+
 .container {
     opacity: 1;
     transition: opacity 0.8s ease-in-out;
@@ -99,7 +103,7 @@ button {
     background-color: #005ae0;
 }
 
-#stop:hover {
+#pause:hover {
     background-color: #c82333;
 }
 
